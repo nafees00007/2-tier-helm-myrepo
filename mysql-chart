@@ -15,7 +15,7 @@ env:
  mysqluser: admin
  mysqlpw: admin
 
-......................................
+ 
 
 service:
   type: ClusterIP
