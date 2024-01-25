@@ -1,0 +1,65 @@
+values.yaml
+
+replicaCount: 1
+
+image:
+  repository: trainwithshubham/flaskapp
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+env:
+   mysqlhost: 10.98.40.100
+   mysqlpw: admin
+   mysqluser: admin
+   mysqldb: mydb
+
+
+service:
+  type: NodePort
+  targetPort: 5000
+  port: 80
+  nodePort: 30007
+
+.........................................................................................................................................
+
+
+templates/deployment.yaml
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: MYSQL_HOST
+              value: {{ .Values.env.mysqlhost }}          # this is your mysql's service clusture IP, Make sure to change it with yours
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.env.mysqlpw }}
+            - name: MYSQL_USER
+              value: {{ .Values.env.mysqluser }}
+            - name: MYSQL_DB
+              value: {{ .Values.env.mysqldb }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+
+
+.....................................................................................................................................
+
+templates/service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flask-app-chart.fullname" . }}
+  labels:
+    {{- include "flask-app-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      nodePort: {{ .Values.service.nodePort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "flask-app-chart.selectorLabels" . | nindent 4 }}
+~
+
