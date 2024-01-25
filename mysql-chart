@@ -1,0 +1,45 @@
+values.yaml
+
+
+replicaCount: 1
+
+image:
+  repository: mysql
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+env:
+ mysqlrootpw: admin
+ mysqldb: mydb
+ mysqluser: admin
+ mysqlpw: admin
+
+......................................
+
+service:
+  type: ClusterIP
+  port: 3306
+...................................
+
+
+
+
+/template/deployment.yaml
+
+ 
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.env.mysqlrootpw }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.env.mysqldb }}
+            - name: MYSQL_USER
+              value: {{ .Values.env.mysqluser }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.env.mysqlpw }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+
